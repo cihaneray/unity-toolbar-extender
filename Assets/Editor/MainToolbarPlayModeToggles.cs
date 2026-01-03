@@ -2,84 +2,190 @@ using System;
 using System.Reflection;
 using UnityEditor;
 using UnityEditor.Toolbars;
+using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Editor
 {
     public static class MainToolbarPlayModeToggles
     {
-        [MainToolbarElement("PlayMode/Play Focused", defaultDockPosition = MainToolbarDockPosition.Right)]
-        public static MainToolbarElement PlayFocusedToggle()
+        [MainToolbarElement("PlayMode/Controls", defaultDockPosition = MainToolbarDockPosition.Middle)]
+        public static MainToolbarElement PlayModeToolbar()
         {
+            var content = new MainToolbarContent("Controls");
+            var element = new MainToolbarButton(content, () => {});
+
+            MainToolbarElementStyler.StyleElement<VisualElement>("PlayMode/Controls", (parent) =>
+            {
+                parent.Clear();
+                parent.style.flexDirection = FlexDirection.Row;
+                parent.style.alignItems = Align.Center;
+                parent.style.backgroundColor = new StyleColor(Color.clear);
+                parent.style.borderTopWidth = 0;
+                parent.style.borderBottomWidth = 0;
+                parent.style.borderLeftWidth = 0;
+                parent.style.borderRightWidth = 0;
+
+                parent.Add(PlayFocusedToggle());
+                parent.Add(PauseToggle());
+                parent.Add(MaximizeOnPlayToggle());
+                parent.Add(MuteAudioToggle());
+                parent.Add(ErrorPauseToggle());
+            });
+
+            Action<ToolbarToggle> styleToggle = (toggle) =>
+            {
+                toggle.style.width = 16;
+                toggle.style.height = 16;
+                toggle.style.marginRight = 2;
+                toggle.style.marginLeft = 2;
+                toggle.style.paddingLeft = 0;
+                toggle.style.paddingRight = 0;
+                toggle.style.paddingTop = 0;
+                toggle.style.paddingBottom = 0;
+                toggle.style.alignSelf = Align.Center;
+                toggle.style.backgroundRepeat = new BackgroundRepeat(Repeat.NoRepeat, Repeat.NoRepeat);
+                toggle.style.backgroundPositionX = new BackgroundPosition(BackgroundPositionKeyword.Center);
+                toggle.style.backgroundPositionY = new BackgroundPosition(BackgroundPositionKeyword.Center);
+                toggle.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Contain);
+            };
+
+            MainToolbarElementStyler.StyleElement("PlayFocusedToggle", styleToggle);
+            MainToolbarElementStyler.StyleElement("PauseToggle", styleToggle);
+            MainToolbarElementStyler.StyleElement("MaximizeOnPlayToggle", styleToggle);
+            MainToolbarElementStyler.StyleElement("MuteAudioToggle", styleToggle);
+            MainToolbarElementStyler.StyleElement("ErrorPauseToggle", styleToggle);
+
+            return element;
+        }
+
+        private static VisualElement PlayFocusedToggle()
+        {
+            var toggle = new ToolbarToggle
+            {
+                name = "PlayFocusedToggle"
+            };
             var icon = EditorGUIUtility.IconContent("d_PlayButton").image as Texture2D;
             if (icon == null) icon = EditorGUIUtility.IconContent("PlayButton").image as Texture2D;
             
-            var content = new MainToolbarContent(icon, "Play Focused");
+            if (icon != null) toggle.style.backgroundImage = icon;
+            toggle.tooltip = "Play Focused";
             
-            EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
-            EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
-
-            return new MainToolbarToggle(content, EditorApplication.isPlaying, (newValue) =>
+            toggle.SetValueWithoutNotify(EditorApplication.isPlaying);
+            
+            toggle.RegisterValueChangedCallback(evt => 
             {
-                EditorApplication.isPlaying = newValue;
-                if (!newValue) return;
+                EditorApplication.isPlaying = evt.newValue;
+                if (!evt.newValue) return;
                 var window = GetGameView();
                 if (window != null) window.Focus();
             });
+
+            Action<PlayModeStateChange> onChange = _ => toggle.SetValueWithoutNotify(EditorApplication.isPlaying);
+            EditorApplication.playModeStateChanged += onChange;
+            toggle.RegisterCallback<DetachFromPanelEvent>(_ => EditorApplication.playModeStateChanged -= onChange);
+
+            return toggle;
         }
 
-        [MainToolbarElement("PlayMode/Pause", defaultDockPosition = MainToolbarDockPosition.Right)]
-        public static MainToolbarElement PauseToggle()
+        private static VisualElement PauseToggle()
         {
+            var toggle = new ToolbarToggle
+            {
+                name = "PauseToggle"
+            };
             var icon = EditorGUIUtility.IconContent("d_PauseButton").image as Texture2D;
             if (icon == null) icon = EditorGUIUtility.IconContent("PauseButton").image as Texture2D;
             
-            var content = new MainToolbarContent(icon, "Pause");
+            if (icon != null) toggle.style.backgroundImage = icon;
+            toggle.tooltip = "Pause";
             
-            EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
-            EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
-
-            return new MainToolbarToggle(content, EditorApplication.isPaused, (newValue) =>
+            toggle.SetValueWithoutNotify(EditorApplication.isPaused);
+            
+            toggle.RegisterValueChangedCallback(evt => 
             {
-                EditorApplication.isPaused = newValue;
+                EditorApplication.isPaused = evt.newValue;
             });
+
+            Action<PlayModeStateChange> onChange = _ => toggle.SetValueWithoutNotify(EditorApplication.isPaused);
+            EditorApplication.playModeStateChanged += onChange;
+            toggle.RegisterCallback<DetachFromPanelEvent>(_ => EditorApplication.playModeStateChanged -= onChange);
+
+            return toggle;
         }
 
-        private static void OnPlayModeStateChanged(PlayModeStateChange state)
+        private static VisualElement MaximizeOnPlayToggle()
         {
-            MainToolbar.Refresh("PlayMode/Play Focused");
-            MainToolbar.Refresh("PlayMode/Pause");
-        }
+            var toggle = new ToolbarToggle
+            {
+                name = "MaximizeOnPlayToggle"
+            };
 
-        [MainToolbarElement("PlayMode/Maximize On Play", defaultDockPosition = MainToolbarDockPosition.Right)]
-        public static MainToolbarElement MaximizeOnPlayToggle()
-        {
-            var icon = EditorGUIUtility.IconContent("d_winbtn_win_max").image as Texture2D;
-            if (icon == null) icon = EditorGUIUtility.IconContent("winbtn_win_max").image as Texture2D;
+            var icon = EditorGUIUtility.IconContent("d_FullScreen").image as Texture2D;
+            if (icon == null) icon = EditorGUIUtility.IconContent("FullScreen").image as Texture2D;
+            if (icon == null) icon = EditorGUIUtility.IconContent("d_ScaleTool").image as Texture2D;
+            if (icon == null) icon = EditorGUIUtility.IconContent("ScaleTool").image as Texture2D;
             if (icon == null) icon = EditorGUIUtility.IconContent("d_ViewToolZoom").image as Texture2D;
+            
+            if (icon != null) toggle.style.backgroundImage = icon;
+            else toggle.text = "Max";
 
-            var content = icon != null ? new MainToolbarContent(icon, "Maximize on Play") : new MainToolbarContent("Max", "Maximize on Play");
-
-            return new MainToolbarToggle(content, GetMaximizeOnPlay(), SetMaximizeOnPlay);
-        }
-
-        [MainToolbarElement("PlayMode/Mute Audio", defaultDockPosition = MainToolbarDockPosition.Right)]
-        public static MainToolbarElement MuteAudioToggle()
-        {
-            var icon = EditorGUIUtility.IconContent("d_SceneViewAudio").image as Texture2D;
-            var content = new MainToolbarContent(icon, "Mute Audio");
-            return new MainToolbarToggle(content, EditorUtility.audioMasterMute, (newValue) =>
+            toggle.tooltip = "Maximize on Play";
+            
+            toggle.SetValueWithoutNotify(GetMaximizeOnPlay());
+            
+            toggle.RegisterValueChangedCallback(evt => 
             {
-                EditorUtility.audioMasterMute = newValue;
+                SetMaximizeOnPlay(evt.newValue);
             });
+
+            return toggle;
         }
 
-        [MainToolbarElement("PlayMode/Error Pause", defaultDockPosition = MainToolbarDockPosition.Right)]
-        public static MainToolbarElement ErrorPauseToggle()
+        private static VisualElement MuteAudioToggle()
         {
-            var icon = EditorGUIUtility.IconContent("Console.ErrorIcon").image as Texture2D;
-            var content = new MainToolbarContent(icon, "Error Pause");
-            return new MainToolbarToggle(content, GetErrorPause(), SetErrorPause);
+            var toggle = new ToolbarToggle
+            {
+                name = "MuteAudioToggle"
+            };
+            var icon = EditorGUIUtility.IconContent("d_SceneViewAudio").image as Texture2D;
+            if (icon == null) icon = EditorGUIUtility.IconContent("SceneViewAudio").image as Texture2D;
+            
+            if (icon != null) toggle.style.backgroundImage = icon;
+            toggle.tooltip = "Mute Audio";
+            
+            toggle.SetValueWithoutNotify(EditorUtility.audioMasterMute);
+            
+            toggle.RegisterValueChangedCallback(evt => 
+            {
+                EditorUtility.audioMasterMute = evt.newValue;
+            });
+
+            return toggle;
+        }
+
+        private static VisualElement ErrorPauseToggle()
+        {
+            var toggle = new ToolbarToggle
+            {
+                name = "ErrorPauseToggle" 
+            };
+
+            var icon = EditorGUIUtility.IconContent("d_Console.ErrorIcon").image as Texture2D;
+            if (icon == null) icon = EditorGUIUtility.IconContent("Console.ErrorIcon").image as Texture2D;
+            
+            if (icon != null) toggle.style.backgroundImage = icon;
+            toggle.tooltip = "Error Pause";
+            
+            toggle.SetValueWithoutNotify(GetErrorPause());
+            
+            toggle.RegisterValueChangedCallback(evt => 
+            {
+                SetErrorPause(evt.newValue);
+            });
+
+            return toggle;
         }
 
         private static bool GetMaximizeOnPlay()
