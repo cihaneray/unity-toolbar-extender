@@ -53,7 +53,7 @@ public static class MainToolbarElementStyler
             if ((element = root.FindElementByTooltip(name)) != null) return element;
         }
 
-        MainToolbarElementStyler.StyleElement<UnityEditor.Toolbars.EditorToolbarButton>("Time/Reset Time Scale", element =>
+        MainToolbarElementStyler.StyleElement<UnityEditor.Toolbars.EditorToolbarButton>("Time/ResetTimeScale", element =>
         {
             element.style.paddingLeft = 0f;
             element.style.paddingRight = 0f;

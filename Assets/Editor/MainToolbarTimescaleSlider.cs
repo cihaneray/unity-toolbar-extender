@@ -23,7 +23,7 @@ public class MainToolbarTimescaleSlider
             });
         };
 
-        MainToolbarElementStyler.StyleElement<VisualElement>("Time/Timescale Slider", (element) =>
+        MainToolbarElementStyler.StyleElement<VisualElement>("Time/TimescaleSlider", (element) =>
         {
             element.style.paddingLeft = k_padding;
         });
