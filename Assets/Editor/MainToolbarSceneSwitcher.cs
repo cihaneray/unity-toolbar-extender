@@ -38,19 +38,22 @@ namespace Editor
 
             foreach (var scene in scenes)
             {
-                if (!scene.enabled) continue;
-                var name = Path.GetFileNameWithoutExtension(scene.path);
-                var path = scene.path;
-                var isCurrent = SceneManager.GetActiveScene().path == path;
-                    
-                menu.AddItem(new GUIContent(name), isCurrent, () =>
+                if (scene.enabled)
                 {
-                    if (SceneManager.GetActiveScene().path == path) return;
-                    if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
-                    {
-                        EditorSceneManager.OpenScene(path);
-                    }
-                });
+                    var name = Path.GetFileNameWithoutExtension(scene.path);
+                    var path = scene.path;
+                    var isCurrent = SceneManager.GetActiveScene().path == path;
+                    
+                    menu.AddItem(new GUIContent(name), isCurrent, () => {
+                        if (SceneManager.GetActiveScene().path != path)
+                        {
+                            if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+                            {
+                                EditorSceneManager.OpenScene(path);
+                            }
+                        }
+                    });
+                }
             }
             
             if (scenes.Length == 0)

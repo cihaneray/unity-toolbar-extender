@@ -10,7 +10,7 @@ namespace Editor
     {
         private static int _lastCount;
 
-        [MainToolbarElement("Scene/Object Count", defaultDockPosition = MainToolbarDockPosition.Right)]
+        [MainToolbarElement("Scene/Object Count", defaultDockPosition = MainToolbarDockPosition.Middle)]
         public static MainToolbarElement SceneObjectCount()
         {
             CalculateCount();
