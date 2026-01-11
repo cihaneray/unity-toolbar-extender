@@ -12,14 +12,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
       - name: Pack Unity Package
-        run: |
-          npx unity-packer pack ToolbarExtension.unitypackage Editor
+        uses: p-v-g/unity-package-packer@v1.0.1
+        with:
+          folder: Editor
+          output: ToolbarExtension.unitypackage
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
