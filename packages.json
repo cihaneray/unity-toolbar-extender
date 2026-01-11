@@ -9,7 +9,12 @@
     "url": "https://github.com/cihaneray"
   },
   "category": "Editor Extensions",
+  "keywords": [
+    "editor",
+    "toolbar",
+    "utilities"
+  ],
   "dependencies": {
-    "com.gitamend.unityutils": "https://github.com/adammyhre/Unity-Utils.git"
+    "com.gitamend.unityutils": "https://github.com/adammyhre/Unity-Utils.git#main"
   }
 }
