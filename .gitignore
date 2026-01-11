@@ -109,6 +109,11 @@ InitTestScene*.unity*
 Packages/
 Assets/*
 
+# Everything in the Assets folder
+*.inputaction*
+Plugins*
+Scenes*
+Settings*
+
 # Don't ignore the Assets/Scripts directory
 !Editor/
-ProjectSettings/
