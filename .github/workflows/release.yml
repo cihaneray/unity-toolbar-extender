@@ -1,0 +1,32 @@
+name: Generate Unity Package
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Pack Unity Package
+        run: |
+          npx unity-packer pack ToolbarExtension.unitypackage Editor
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ToolbarExtension.unitypackage
+          tag_name: v1.0.${{ github.run_number }}
+          name: Release v1.0.${{ github.run_number }}
+          body: "Automated build of the editor toolbar extension."
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
