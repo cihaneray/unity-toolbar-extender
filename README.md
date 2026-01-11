@@ -23,8 +23,17 @@ Add the following line to your `Packages/manifest.json`:
 ## Installation
 
 1. Ensure the **Prerequisites** are met.
-2. Download or clone this repository.
-3. Copy the script files into any `Editor` folder in your Unity project (e.g., `Assets/Editor`).
+2. Open the Package Manager in Unity.
+3. Click the `+` button in the top left.
+4. Select **Add package from git URL...**
+5. Enter the git URL of this repository:
+   `https://github.com/cihaneray/unity-toolbar-extender.git`
+
+**Or via manifest.json:**
+Add the following line to your `Packages/manifest.json`:
+```
+"com.cihaneray.toolbar-extension": "https://github.com/cihaneray/unity-toolbar-extender.git"
+```
 
 ## Included Extenders
 
