@@ -110,5 +110,5 @@ Packages/
 Assets/*
 
 # Don't ignore the Assets/Scripts directory
-!/Assets/Editor
+!Editor/
 ProjectSettings/

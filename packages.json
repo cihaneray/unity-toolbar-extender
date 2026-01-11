@@ -1,0 +1,15 @@
+{
+  "name": "com.cihaneray.toolbar-extension",
+  "version": "1.0.0",
+  "displayName": "Editor Toolbar Extension",
+  "description": "A set of custom utilities for the Unity 6.3 LTS toolbar.",
+  "unity": "6000.0",
+  "author": {
+    "name": "Cihan Eray",
+    "url": "https://github.com/cihaneray"
+  },
+  "category": "Editor Extensions",
+  "dependencies": {
+    "com.gitamend.unityutils": "https://github.com/adammyhre/Unity-Utils.git"
+  }
+}
