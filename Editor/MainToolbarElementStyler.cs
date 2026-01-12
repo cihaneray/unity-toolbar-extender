@@ -49,11 +49,18 @@ namespace Editor
             var windows = Resources.FindObjectsOfTypeAll<EditorWindow>();
             foreach (var window in windows)
             {
-                var root = window.rootVisualElement;
-                if (root == null)
-                    continue;
-                VisualElement element;
-                if ((element = root.FindElementByName(name)) != null || (element = root.FindElementByTooltip(name)) != null) return element;
+                try
+                {
+                    var root = window.rootVisualElement;
+                    if (root == null)
+                        continue;
+                    VisualElement element;
+                    if ((element = root.FindElementByName(name)) != null || (element = root.FindElementByTooltip(name)) != null) return element;
+                }
+                catch
+                {
+                    // Safe iteration: ignore windows that might be in an invalid state/rebuild
+                }
             }
 
 
