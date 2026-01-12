@@ -27,12 +27,12 @@ Add the following line to your `Packages/manifest.json`:
 3. Click the `+` button in the top left.
 4. Select **Add package from git URL...**
 5. Enter the git URL of this repository:
-   `https://github.com/your-username/unity-toolbar-extender.git`
+   `https://github.com/cihaneray/unity-toolbar-extender.git`
 
 **Or via manifest.json:**
 Add the following line to your `Packages/manifest.json`:
-```json
-"com.your-username.unity-toolbar-extender": "https://github.com/your-username/unity-toolbar-extender.git"
+```
+"com.cihaneray.toolbar-extension": "https://github.com/cihaneray/unity-toolbar-extender.git"
 ```
 
 ## Included Extenders
