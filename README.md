@@ -37,6 +37,8 @@ Add the following line to your `Packages/manifest.json`:
 
 ## Included Extenders
 
+![Toolbar Extenders Preview](screenshot.png)
+
 The collection includes several useful tools located in the `Editor` folder.
 
 ### Play Mode Controls
