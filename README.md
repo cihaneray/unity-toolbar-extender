@@ -4,21 +4,35 @@ A collection of ready-to-use toolbar buttons and utilities for the Unity Editor.
 
 > **Note:** This repository is a collection of extension scripts. It relies on the **Unity-Utils** package to function.
 
-## Installation
+## Prerequisites
 
-This package relies on [`Unity-Utils`](https://github.com/adammyhre/Unity-Utils). When you install this package via the Package Manager, Unity will automatically handle the dependencies.
+These extenders use the Toolbar system provided by `Unity-Utils`. You must install this package for the scripts to work.
 
 **Install via Package Manager (Git URL):**
 1. Open the Package Manager in Unity.
 2. Click the `+` button in the top left.
 3. Select **Add package from git URL...**
-4. Enter the git URL of this repository:
-   `https://github.com/cihaneray/unity-toolbar-extender.git`
+4. Enter: `https://github.com/adammyhre/Unity-Utils.git`
 
 **Or via manifest.json:**
 Add the following line to your `Packages/manifest.json`:
 ```
-"com.cihaneray.toolbar-extension": "https://github.com/cihaneray/unity-toolbar-extender.git"
+"com.gitamend.unityutils": "https://github.com/adammyhre/Unity-Utils.git"
+```
+
+## Installation
+
+1. Ensure the **Prerequisites** are met.
+2. Open the Package Manager in Unity.
+3. Click the `+` button in the top left.
+4. Select **Add package from git URL...**
+5. Enter the git URL of this repository:
+   `https://github.com/your-username/unity-toolbar-extender.git`
+
+**Or via manifest.json:**
+Add the following line to your `Packages/manifest.json`:
+```json
+"com.your-username.unity-toolbar-extender": "https://github.com/your-username/unity-toolbar-extender.git"
 ```
 
 ## Included Extenders
