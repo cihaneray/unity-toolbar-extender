@@ -37,7 +37,7 @@ Add the following line to your `Packages/manifest.json`:
 
 ## Included Extenders
 
-![Toolbar Extenders Preview](screenshot.png)
+![Toolbar Extenders Preview](Screenshots/overview-1.png)
 
 The collection includes several useful tools located in the `Editor` folder.
 
@@ -45,12 +45,16 @@ The collection includes several useful tools located in the `Editor` folder.
 **File:** `MainToolbarPlayModeToggles.cs`
 **Dock Position:** Middle
 
-A comprehensive set of toggles and buttons for Play Mode interactions, grouped together in the toolbar:
+A comprehensive set of tools for Play Mode interactions:
 - **Focused Start**: Enters Play Mode and automatically focuses the Game View.
 - **Pause/Continue**: Toggles the pause state of the editor.
 - **Maximize on Play**: Toggles the "Maximize on Play" setting.
 - **Mute Audio**: Toggles the "Mute Audio" setting.
 - **Error Pause**: Toggles "Error Pause" (pause execution when an exception occurs).
+- **Reload Scene**: Reloads the currently active scene (Play Mode only).
+- **Start From Scene**:
+    - **Toggle**: Enable/Disable forcing the game to start from a specific scene.
+    - **Selector**: Choose which scene to always start from (e.g. your Main Menu), regardless of which scene you are currently editing.
 
 ### Scene Tools
 
@@ -66,15 +70,13 @@ A comprehensive set of toggles and buttons for Play Mode interactions, grouped t
 
 ### Time Management
 
-**Timescale Slider**
+**Time Scale Controls**
 - **File:** `MainToolbarTimescaleSlider.cs`
-- **Dock Position:** Middle
-- **Description:** A slider to adjust `Time.timeScale` dynamically from the toolbar (range: 0x to 5x). Includes a context menu (right-click) to reset.
+- **Dock Position:** Right
+- **Description:** A streamlined button to monitor and control `Time.timeScale`. Text updates in real-time.
+    - **Click**: Opens a popup with a precise slider (0x - 5x) and quick presets (Pause, 0.1x, 0.5x, Normal, 2x, 5x).
 
-**Reset Time Scale**
-- **File:** `MainToolbarButtons.cs`
-- **Dock Position:** Middle
-- **Description:** A button to instantly reset the timescale to 1.0.
+![Time Scale Popup](Screenshots/timescale_popup.png)
 
 ### Project Utilities
 
@@ -111,4 +113,3 @@ namespace Editor
 ## Styling
 
 For advanced styling, the included `MainToolbarElementStyler.cs` helper allows you to manipulate the visual elements (VisualElements) of the toolbar buttons, useful for adjusting padding, icons, or layout.
-
