@@ -6,11 +6,15 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
+using UnityEditor.SceneManagement;
 
 namespace Editor
 {
     public static class MainToolbarPlayModeToggles
     {
+        private const string StartScenePathKey = "MainToolbar_StartScenePath";
+        private const string StartSceneToggleKey = "MainToolbar_StartSceneToggle";
+
         [MainToolbarElement("PlayMode/Controls", defaultDockPosition = MainToolbarDockPosition.Middle)]
         public static MainToolbarElement PlayModeToolbar()
         {
@@ -34,6 +38,8 @@ namespace Editor
                 parent.Add(MuteAudioToggle());
                 parent.Add(ErrorPauseToggle());
                 parent.Add(ReloadSceneButton());
+                parent.Add(StartFromSceneToggle());
+                parent.Add(StartSceneSelectionButton());
             });
 
             Action<VisualElement> styleToggle = (toggle) =>
@@ -59,8 +65,111 @@ namespace Editor
             MainToolbarElementStyler.StyleElement("MuteAudioToggle", styleToggle);
             MainToolbarElementStyler.StyleElement("ErrorPauseToggle", styleToggle);
             MainToolbarElementStyler.StyleElement("ReloadSceneButton", styleToggle);
+            MainToolbarElementStyler.StyleElement("StartFromSceneToggle", styleToggle);
+            // StartSceneSelectionButton is styled inline/dynamically
 
             return element;
+        }
+
+        private static VisualElement StartFromSceneToggle()
+        {
+            var toggle = new ToolbarToggle
+            {
+                name = "StartFromSceneToggle",
+                tooltip = "Enable Start from Selected Scene"
+            };
+
+            var icon = EditorGUIUtility.IconContent("d_UnityEditor.SceneHierarchyWindow").image as Texture2D;
+            if (icon == null) icon = EditorGUIUtility.IconContent("UnityEditor.SceneHierarchyWindow").image as Texture2D;
+            if (icon != null) toggle.style.backgroundImage = icon;
+
+            bool isActive = EditorPrefs.GetBool(StartSceneToggleKey, false);
+            toggle.SetValueWithoutNotify(isActive);
+            UpdatePlayModeStartScene(isActive);
+
+            toggle.RegisterValueChangedCallback(evt =>
+            {
+                EditorPrefs.SetBool(StartSceneToggleKey, evt.newValue);
+                UpdatePlayModeStartScene(evt.newValue);
+            });
+
+            return toggle;
+        }
+
+        private static VisualElement StartSceneSelectionButton()
+        {
+            var button = new ToolbarButton(() =>
+            {
+                var menu = new GenericMenu();
+                
+                foreach (var scene in EditorBuildSettings.scenes)
+                {
+                    if (!scene.enabled) continue;
+                    string path = scene.path;
+                    string name = System.IO.Path.GetFileNameWithoutExtension(path);
+
+                    menu.AddItem(new GUIContent(name), path == EditorPrefs.GetString(StartScenePathKey), () => {
+                        EditorPrefs.SetString(StartScenePathKey, path);
+                        UpdatePlayModeStartScene(EditorPrefs.GetBool(StartSceneToggleKey, false));
+                    });
+                }
+                
+                if (EditorBuildSettings.scenes.Length == 0)
+                {
+                    menu.AddDisabledItem(new GUIContent("No scenes in build settings"));
+                }
+                
+                menu.AddSeparator("");
+                menu.AddItem(new GUIContent("Open Build Settings..."), false, () => {
+                     EditorWindow.GetWindow(typeof(BuildPlayerWindow));
+                });
+
+                menu.ShowAsContext();
+            })
+            {
+                name = "StartSceneSelectionButton",
+                tooltip = "Select Scene to Start In",
+                style =
+                {
+                    width = 80,
+                    marginRight = 2,
+                    marginLeft = 2,
+                    unityTextAlign = TextAnchor.MiddleLeft
+                }
+            };
+
+            // Poll to find name
+            button.schedule.Execute(() => {
+                string path = EditorPrefs.GetString(StartScenePathKey, "");
+                if (string.IsNullOrEmpty(path)) 
+                {
+                     button.text = "Select Scene";
+                }
+                else 
+                {
+                     string name = System.IO.Path.GetFileNameWithoutExtension(path);
+                     if (string.IsNullOrEmpty(name)) button.text = "Missing";
+                     else button.text = name;
+                }
+            }).Every(500);
+
+            return button;
+        }
+
+        private static void UpdatePlayModeStartScene(bool enable)
+        {
+            if (!enable)
+            {
+                EditorSceneManager.playModeStartScene = null;
+                return;
+            }
+
+            string path = EditorPrefs.GetString(StartScenePathKey, "");
+            if (string.IsNullOrEmpty(path)) return;
+
+            SceneAsset asset = AssetDatabase.LoadAssetAtPath<SceneAsset>(path);
+            if (asset != null) EditorSceneManager.playModeStartScene = asset;
+            else EditorSceneManager.playModeStartScene = null; // Fallback if asset missing
         }
 
         private static VisualElement PlayFocusedToggle()
