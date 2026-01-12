@@ -5,6 +5,7 @@ using UnityEditor.Toolbars;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEngine.SceneManagement;
 
 namespace Editor
 {
@@ -32,9 +33,10 @@ namespace Editor
                 parent.Add(MaximizeOnPlayToggle());
                 parent.Add(MuteAudioToggle());
                 parent.Add(ErrorPauseToggle());
+                parent.Add(ReloadSceneButton());
             });
 
-            Action<ToolbarToggle> styleToggle = (toggle) =>
+            Action<VisualElement> styleToggle = (toggle) =>
             {
                 toggle.style.width = 16;
                 toggle.style.height = 16;
@@ -56,6 +58,7 @@ namespace Editor
             MainToolbarElementStyler.StyleElement("MaximizeOnPlayToggle", styleToggle);
             MainToolbarElementStyler.StyleElement("MuteAudioToggle", styleToggle);
             MainToolbarElementStyler.StyleElement("ErrorPauseToggle", styleToggle);
+            MainToolbarElementStyler.StyleElement("ReloadSceneButton", styleToggle);
 
             return element;
         }
@@ -186,6 +189,30 @@ namespace Editor
             });
 
             return toggle;
+        }
+
+        private static VisualElement ReloadSceneButton()
+        {
+            var button = new ToolbarButton(() =>
+            {
+                if (Application.isPlaying)
+                {
+                    SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+                }
+                else
+                {
+                    Debug.Log("Reloading scene is only available during Play Mode.");
+                }
+            })
+            {
+                name = "ReloadSceneButton",
+                tooltip = "Reload Active Scene in Play Mode"
+            };
+
+            var icon = EditorGUIUtility.IconContent("RotateTool").image as Texture2D;
+            if (icon != null) button.style.backgroundImage = icon;
+
+            return button;
         }
 
         private static bool GetMaximizeOnPlay()
