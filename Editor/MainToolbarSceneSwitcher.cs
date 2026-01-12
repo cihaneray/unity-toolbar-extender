@@ -16,7 +16,7 @@ namespace Editor
             var sceneName = currentScene.IsValid() ? currentScene.name : "Unsaved Scene";
             if (string.IsNullOrEmpty(sceneName)) sceneName = "Unsaved Scene";
             
-            var content = new MainToolbarContent(sceneName, "Click to switch scene");
+            var content = new MainToolbarContent("Switch Scene ▾", "Click to switch scene");
             var button = new MainToolbarButton(content, ShowSceneMenu);
 
             // Subscribe to scene opened event to refresh the button label
