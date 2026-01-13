@@ -102,6 +102,14 @@ namespace Editor
             {
                 var menu = new GenericMenu();
                 
+                // Add "None" option
+                bool isNone = string.IsNullOrEmpty(EditorPrefs.GetString(StartScenePathKey));
+                menu.AddItem(new GUIContent("None"), isNone, () => {
+                    EditorPrefs.SetString(StartScenePathKey, "");
+                    UpdatePlayModeStartScene(EditorPrefs.GetBool(StartSceneToggleKey, false));
+                });
+                menu.AddSeparator("");
+
                 foreach (var scene in EditorBuildSettings.scenes)
                 {
                     if (!scene.enabled) continue;
@@ -121,7 +129,7 @@ namespace Editor
                 
                 menu.AddSeparator("");
                 menu.AddItem(new GUIContent("Open Build Settings..."), false, () => {
-                     EditorWindow.GetWindow(typeof(BuildPlayerWindow));
+                    EditorWindow.GetWindow(typeof(BuildPlayerWindow));
                 });
 
                 menu.ShowAsContext();
@@ -134,7 +142,9 @@ namespace Editor
                     width = 80,
                     marginRight = 2,
                     marginLeft = 2,
-                    unityTextAlign = TextAnchor.MiddleLeft
+                    unityTextAlign = TextAnchor.MiddleLeft,
+                    whiteSpace = WhiteSpace.NoWrap,
+                    textOverflow = TextOverflow.Ellipsis
                 }
             };
 
@@ -143,7 +153,7 @@ namespace Editor
                 string path = EditorPrefs.GetString(StartScenePathKey, "");
                 if (string.IsNullOrEmpty(path)) 
                 {
-                     button.text = "Select Scene";
+                     button.text = "Not Selected";
                 }
                 else 
                 {
