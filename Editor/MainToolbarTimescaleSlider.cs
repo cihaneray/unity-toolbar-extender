@@ -9,9 +9,6 @@ namespace Editor
 {
     public class MainToolbarTimescaleSlider
     {
-        private const float KMinTimeScale = 0f;
-        private const float KMaxTimeScale = 5f;
-
         [MainToolbarElement("Time/Controls", defaultDockPosition = MainToolbarDockPosition.Middle)]
         public static MainToolbarElement TimeControls()
         {
@@ -28,13 +25,14 @@ namespace Editor
                 ToolbarButton timeScaleBtn = null;
                 timeScaleBtn = new ToolbarButton(() =>
                 {
-                    Vector2 mouseScreenPos = Vector2.zero;
+                    var mouseScreenPos = Vector2.zero;
                     if (Event.current != null)
                         mouseScreenPos = GUIUtility.GUIToScreenPoint(Event.current.mousePosition);
 
-                    Rect popupRect = new Rect(mouseScreenPos.x - 110, mouseScreenPos.y + 14, 220, 0);
+                    var popupRect = new Rect(mouseScreenPos.x - 110, mouseScreenPos.y + 14, 220, 0);
 
-                    UnityEditor.PopupWindow.Show(popupRect, new TimeScalePopup((newScale) => {
+                    UnityEditor.PopupWindow.Show(popupRect, new TimeScalePopup((newScale) =>
+                    {
                         Time.timeScale = newScale;
                         timeScaleBtn.text = $"Time Scale: {newScale:0.00}x";
                     }));
@@ -43,15 +41,12 @@ namespace Editor
                     tooltip = "Click to adjust Time Scale",
                     style =
                     {
-                         unityTextAlign = TextAnchor.MiddleCenter,
-                         width = 130
-                    }
+                        unityTextAlign = TextAnchor.MiddleCenter,
+                        width = 130
+                    },
+                    // Set initial text
+                    text = $"Time Scale: {Time.timeScale:0.00}x"
                 };
-                
-                // Poll to keep text updated (in case changed via scripts or inspector)
-                timeScaleBtn.schedule.Execute(() => {
-                     timeScaleBtn.text = $"Time Scale: {Time.timeScale:0.00}x";
-                }).Every(200);
 
                 parent.Add(timeScaleBtn);
             });
@@ -62,11 +57,13 @@ namespace Editor
 
     public class TimeScalePopup : PopupWindowContent
     {
-        private Action<float> _onScaleChanged;
-        
+        private const float KMinTimeScale = 0f;
+        private const float KMaxTimeScale = 5f;
+        private readonly Action<float> onScaleChanged;
+
         public TimeScalePopup(Action<float> onScaleChanged)
         {
-            _onScaleChanged = onScaleChanged;
+            this.onScaleChanged = onScaleChanged;
         }
 
         public override Vector2 GetWindowSize()
@@ -83,7 +80,7 @@ namespace Editor
 
             GUILayout.BeginVertical();
             GUILayout.Space(8);
-            
+
             GUILayout.BeginHorizontal();
             GUILayout.Space(12);
             GUILayout.Label($"Current: {Time.timeScale:0.00}x", EditorStyles.boldLabel);
@@ -95,16 +92,17 @@ namespace Editor
             GUILayout.BeginHorizontal();
             GUILayout.Space(6);
             EditorGUI.BeginChangeCheck();
-            float newVal = EditorGUILayout.Slider(Time.timeScale, 0f, 5f);
+            var newVal = EditorGUILayout.Slider(Time.timeScale, KMinTimeScale, KMaxTimeScale);
             if (EditorGUI.EndChangeCheck())
             {
-                _onScaleChanged?.Invoke(newVal);
+                onScaleChanged?.Invoke(newVal);
             }
+
             GUILayout.Space(6);
             GUILayout.EndHorizontal();
 
             GUILayout.Space(10);
-            
+
             GUILayout.BeginHorizontal();
             GUILayout.Space(12);
             GUILayout.Label("Presets", EditorStyles.miniLabel);
@@ -113,7 +111,7 @@ namespace Editor
             GUILayout.Space(2);
             DrawPresetRow(0f, 0.1f, 0.5f);
             DrawPresetRow(1f, 2f, 5f);
-            
+
             GUILayout.EndVertical();
         }
 
@@ -124,20 +122,19 @@ namespace Editor
             foreach (var v in values)
             {
                 var label = v == 0f ? "Pause" : $"{v}x";
-                if (v == 1f) label = "Normal";
-                
+                if (Mathf.Approximately(v, 1f)) label = "Normal";
+
                 var style = new GUIStyle(EditorStyles.miniButton);
                 if (Mathf.Approximately(Time.timeScale, v))
                 {
                     style.fontStyle = FontStyle.Bold;
                 }
 
-                if (GUILayout.Button(label, style))
-                {
-                    _onScaleChanged?.Invoke(v);
-                    editorWindow.Close();
-                }
+                if (!GUILayout.Button(label, style)) continue;
+                onScaleChanged?.Invoke(v);
+                editorWindow.Close();
             }
+
             GUILayout.Space(8);
             GUILayout.EndHorizontal();
         }

@@ -1,6 +1,5 @@
 using System;
 using UnityEditor;
-using UnityEditor.Toolbars;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityUtils;
@@ -41,7 +40,6 @@ namespace Editor
             {
                 styleCallback(element);
             }
-
         }
 
         private static VisualElement FindElementByName(string name)
@@ -55,14 +53,14 @@ namespace Editor
                     if (root == null)
                         continue;
                     VisualElement element;
-                    if ((element = root.FindElementByName(name)) != null || (element = root.FindElementByTooltip(name)) != null) return element;
+                    if ((element = root.FindElementByName(name)) != null ||
+                        (element = root.FindElementByTooltip(name)) != null) return element;
                 }
                 catch
                 {
                     // Safe iteration: ignore windows that might be in an invalid state/rebuild
                 }
             }
-
 
 
             return null;

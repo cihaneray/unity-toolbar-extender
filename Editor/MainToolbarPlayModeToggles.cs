@@ -19,7 +19,7 @@ namespace Editor
         public static MainToolbarElement PlayModeToolbar()
         {
             var content = new MainToolbarContent("Controls");
-            var element = new MainToolbarButton(content, () => {});
+            var element = new MainToolbarButton(content, () => { });
 
             MainToolbarElementStyler.StyleElement<VisualElement>("PlayMode/Controls", (parent) =>
             {
@@ -66,7 +66,6 @@ namespace Editor
             MainToolbarElementStyler.StyleElement("ErrorPauseToggle", styleToggle);
             MainToolbarElementStyler.StyleElement("ReloadSceneButton", styleToggle);
             MainToolbarElementStyler.StyleElement("StartFromSceneToggle", styleToggle);
-            // StartSceneSelectionButton is styled inline/dynamically
 
             return element;
         }
@@ -80,10 +79,11 @@ namespace Editor
             };
 
             var icon = EditorGUIUtility.IconContent("d_UnityEditor.SceneHierarchyWindow").image as Texture2D;
-            if (icon == null) icon = EditorGUIUtility.IconContent("UnityEditor.SceneHierarchyWindow").image as Texture2D;
+            if (icon == null)
+                icon = EditorGUIUtility.IconContent("UnityEditor.SceneHierarchyWindow").image as Texture2D;
             if (icon != null) toggle.style.backgroundImage = icon;
 
-            bool isActive = EditorPrefs.GetBool(StartSceneToggleKey, false);
+            var isActive = EditorPrefs.GetBool(StartSceneToggleKey, false);
             toggle.SetValueWithoutNotify(isActive);
             UpdatePlayModeStartScene(isActive);
 
@@ -98,39 +98,42 @@ namespace Editor
 
         private static VisualElement StartSceneSelectionButton()
         {
-            var button = new ToolbarButton(() =>
+            ToolbarButton button = null;
+            button = new ToolbarButton(() =>
             {
                 var menu = new GenericMenu();
-                
-                // Add "None" option
-                bool isNone = string.IsNullOrEmpty(EditorPrefs.GetString(StartScenePathKey));
-                menu.AddItem(new GUIContent("None"), isNone, () => {
+
+                var isNone = string.IsNullOrEmpty(EditorPrefs.GetString(StartScenePathKey));
+                menu.AddItem(new GUIContent("None"), isNone, () =>
+                {
                     EditorPrefs.SetString(StartScenePathKey, "");
                     UpdatePlayModeStartScene(EditorPrefs.GetBool(StartSceneToggleKey, false));
+                    button.text = "Not Selected";
                 });
                 menu.AddSeparator("");
 
                 foreach (var scene in EditorBuildSettings.scenes)
                 {
                     if (!scene.enabled) continue;
-                    string path = scene.path;
-                    string name = System.IO.Path.GetFileNameWithoutExtension(path);
+                    var path = scene.path;
+                    var name = System.IO.Path.GetFileNameWithoutExtension(path);
 
-                    menu.AddItem(new GUIContent(name), path == EditorPrefs.GetString(StartScenePathKey), () => {
+                    menu.AddItem(new GUIContent(name), path == EditorPrefs.GetString(StartScenePathKey), () =>
+                    {
                         EditorPrefs.SetString(StartScenePathKey, path);
                         UpdatePlayModeStartScene(EditorPrefs.GetBool(StartSceneToggleKey, false));
+                        button.text = name;
                     });
                 }
-                
+
                 if (EditorBuildSettings.scenes.Length == 0)
                 {
                     menu.AddDisabledItem(new GUIContent("No scenes in build settings"));
                 }
-                
+
                 menu.AddSeparator("");
-                menu.AddItem(new GUIContent("Open Build Settings..."), false, () => {
-                    EditorWindow.GetWindow(typeof(BuildPlayerWindow));
-                });
+                menu.AddItem(new GUIContent("Open Build Settings..."), false,
+                    () => { EditorWindow.GetWindow(typeof(BuildPlayerWindow)); });
 
                 menu.ShowAsContext();
             })
@@ -148,20 +151,17 @@ namespace Editor
                 }
             };
 
-            // Poll to find name
-            button.schedule.Execute(() => {
-                string path = EditorPrefs.GetString(StartScenePathKey, "");
-                if (string.IsNullOrEmpty(path)) 
-                {
-                     button.text = "Not Selected";
-                }
-                else 
-                {
-                     string name = System.IO.Path.GetFileNameWithoutExtension(path);
-                     if (string.IsNullOrEmpty(name)) button.text = "Missing";
-                     else button.text = name;
-                }
-            }).Every(500);
+            // Set initial text
+            var initialPath = EditorPrefs.GetString(StartScenePathKey, "");
+            if (string.IsNullOrEmpty(initialPath))
+            {
+                button.text = "Not Selected";
+            }
+            else
+            {
+                var initialName = System.IO.Path.GetFileNameWithoutExtension(initialPath);
+                button.text = string.IsNullOrEmpty(initialName) ? "Missing" : initialName;
+            }
 
             return button;
         }
@@ -174,12 +174,11 @@ namespace Editor
                 return;
             }
 
-            string path = EditorPrefs.GetString(StartScenePathKey, "");
+            var path = EditorPrefs.GetString(StartScenePathKey, "");
             if (string.IsNullOrEmpty(path)) return;
 
-            SceneAsset asset = AssetDatabase.LoadAssetAtPath<SceneAsset>(path);
-            if (asset != null) EditorSceneManager.playModeStartScene = asset;
-            else EditorSceneManager.playModeStartScene = null; // Fallback if asset missing
+            var asset = AssetDatabase.LoadAssetAtPath<SceneAsset>(path);
+            EditorSceneManager.playModeStartScene = asset != null ? asset : null;
         }
 
         private static VisualElement PlayFocusedToggle()
@@ -190,13 +189,13 @@ namespace Editor
             };
             var icon = EditorGUIUtility.IconContent("d_PlayButton").image as Texture2D;
             if (icon == null) icon = EditorGUIUtility.IconContent("PlayButton").image as Texture2D;
-            
+
             if (icon != null) toggle.style.backgroundImage = icon;
             toggle.tooltip = "Play Focused";
-            
+
             toggle.SetValueWithoutNotify(EditorApplication.isPlaying);
-            
-            toggle.RegisterValueChangedCallback(evt => 
+
+            toggle.RegisterValueChangedCallback(evt =>
             {
                 EditorApplication.isPlaying = evt.newValue;
                 if (!evt.newValue) return;
@@ -219,16 +218,13 @@ namespace Editor
             };
             var icon = EditorGUIUtility.IconContent("d_PauseButton").image as Texture2D;
             if (icon == null) icon = EditorGUIUtility.IconContent("PauseButton").image as Texture2D;
-            
+
             if (icon != null) toggle.style.backgroundImage = icon;
             toggle.tooltip = "Pause";
-            
+
             toggle.SetValueWithoutNotify(EditorApplication.isPaused);
-            
-            toggle.RegisterValueChangedCallback(evt => 
-            {
-                EditorApplication.isPaused = evt.newValue;
-            });
+
+            toggle.RegisterValueChangedCallback(evt => { EditorApplication.isPaused = evt.newValue; });
 
             Action<PlayModeStateChange> onChange = _ => toggle.SetValueWithoutNotify(EditorApplication.isPaused);
             EditorApplication.playModeStateChanged += onChange;
@@ -249,18 +245,15 @@ namespace Editor
             if (icon == null) icon = EditorGUIUtility.IconContent("d_ScaleTool").image as Texture2D;
             if (icon == null) icon = EditorGUIUtility.IconContent("ScaleTool").image as Texture2D;
             if (icon == null) icon = EditorGUIUtility.IconContent("d_ViewToolZoom").image as Texture2D;
-            
+
             if (icon != null) toggle.style.backgroundImage = icon;
             else toggle.text = "Max";
 
             toggle.tooltip = "Maximize on Play";
-            
+
             toggle.SetValueWithoutNotify(GetMaximizeOnPlay());
-            
-            toggle.RegisterValueChangedCallback(evt => 
-            {
-                SetMaximizeOnPlay(evt.newValue);
-            });
+
+            toggle.RegisterValueChangedCallback(evt => { SetMaximizeOnPlay(evt.newValue); });
 
             return toggle;
         }
@@ -273,16 +266,13 @@ namespace Editor
             };
             var icon = EditorGUIUtility.IconContent("d_SceneViewAudio").image as Texture2D;
             if (icon == null) icon = EditorGUIUtility.IconContent("SceneViewAudio").image as Texture2D;
-            
+
             if (icon != null) toggle.style.backgroundImage = icon;
             toggle.tooltip = "Mute Audio";
-            
+
             toggle.SetValueWithoutNotify(EditorUtility.audioMasterMute);
-            
-            toggle.RegisterValueChangedCallback(evt => 
-            {
-                EditorUtility.audioMasterMute = evt.newValue;
-            });
+
+            toggle.RegisterValueChangedCallback(evt => { EditorUtility.audioMasterMute = evt.newValue; });
 
             return toggle;
         }
@@ -291,21 +281,18 @@ namespace Editor
         {
             var toggle = new ToolbarToggle
             {
-                name = "ErrorPauseToggle" 
+                name = "ErrorPauseToggle"
             };
 
             var icon = EditorGUIUtility.IconContent("d_Console.ErrorIcon").image as Texture2D;
             if (icon == null) icon = EditorGUIUtility.IconContent("Console.ErrorIcon").image as Texture2D;
-            
+
             if (icon != null) toggle.style.backgroundImage = icon;
             toggle.tooltip = "Error Pause";
-            
+
             toggle.SetValueWithoutNotify(GetErrorPause());
-            
-            toggle.RegisterValueChangedCallback(evt => 
-            {
-                SetErrorPause(evt.newValue);
-            });
+
+            toggle.RegisterValueChangedCallback(evt => { SetErrorPause(evt.newValue); });
 
             return toggle;
         }
@@ -338,7 +325,8 @@ namespace Editor
         {
             var window = GetGameView();
             if (window == null) return false;
-            var prop = window.GetType().GetProperty("maximizeOnPlay", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            var prop = window.GetType().GetProperty("maximizeOnPlay",
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             if (prop == null) return false;
             return (bool)prop.GetValue(window);
         }
@@ -354,7 +342,8 @@ namespace Editor
             }
 
             if (window == null) return;
-            var prop = window.GetType().GetProperty("maximizeOnPlay", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            var prop = window.GetType().GetProperty("maximizeOnPlay",
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             if (prop != null)
                 prop.SetValue(window, enabled);
         }
@@ -378,7 +367,8 @@ namespace Editor
             var consoleWindowType = Type.GetType("UnityEditor.ConsoleWindow,UnityEditor");
             if (consoleWindowType == null) return;
             var window = EditorWindow.GetWindow(consoleWindowType, false, "Console", false);
-            var method = consoleWindowType.GetMethod("SetConsoleErrorPause", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            var method = consoleWindowType.GetMethod("SetConsoleErrorPause",
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             if (method != null)
             {
                 method.Invoke(window, new object[] { enabled });

@@ -1,5 +1,5 @@
 using UnityEditor;
-using UnityEditor.Toolbars;  
+using UnityEditor.Toolbars;
 using UnityEngine;
 
 namespace Editor
@@ -13,7 +13,5 @@ namespace Editor
             var content = new MainToolbarContent(icon);
             return new MainToolbarButton(content, () => { SettingsService.OpenProjectSettings(); });
         }
-
-
     }
 }
