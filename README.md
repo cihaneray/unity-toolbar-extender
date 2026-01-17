@@ -37,7 +37,7 @@ Add the following line to your `Packages/manifest.json`:
 
 ## Included Extenders
 
-![Toolbar Extenders Preview](Screenshots/overview-1.png)
+![Toolbar Extenders Preview](Screenshots~/overview-1.png)
 
 The collection includes several useful tools located in the `Editor` folder.
 
@@ -76,7 +76,7 @@ A comprehensive set of tools for Play Mode interactions:
 - **Description:** A streamlined button to monitor and control `Time.timeScale`. Text updates in real-time.
     - **Click**: Opens a popup with a precise slider (0x - 5x) and quick presets (Pause, 0.1x, 0.5x, Normal, 2x, 5x).
 
-![Time Scale Popup](Screenshots/timescale_popup.png)
+![Time Scale Popup](Screenshots~/timescale_popup.png)
 
 ### Project Utilities
 
