@@ -12,8 +12,8 @@ namespace Editor
 {
     public static class MainToolbarPlayModeToggles
     {
-        private const string StartScenePathKey = "MainToolbar_StartScenePath";
-        private const string StartSceneToggleKey = "MainToolbar_StartSceneToggle";
+        private static string StartScenePathKey => $"{Application.dataPath.GetHashCode()}_MainToolbar_StartScenePath";
+        private static string StartSceneToggleKey => $"{Application.dataPath.GetHashCode()}_MainToolbar_StartSceneToggle";
 
         [MainToolbarElement("PlayMode/Controls", defaultDockPosition = MainToolbarDockPosition.Middle)]
         public static MainToolbarElement PlayModeToolbar()
@@ -153,14 +153,17 @@ namespace Editor
 
             // Set initial text
             var initialPath = EditorPrefs.GetString(StartScenePathKey, "");
-            if (string.IsNullOrEmpty(initialPath))
+            var sceneAsset = string.IsNullOrEmpty(initialPath) ? null : AssetDatabase.LoadAssetAtPath<SceneAsset>(initialPath);
+            
+            if (sceneAsset == null)
             {
                 button.text = "Not Selected";
+                // Optionally clear the invalid path from prefs
+                if (!string.IsNullOrEmpty(initialPath)) EditorPrefs.SetString(StartScenePathKey, "");
             }
             else
             {
-                var initialName = System.IO.Path.GetFileNameWithoutExtension(initialPath);
-                button.text = string.IsNullOrEmpty(initialName) ? "Missing" : initialName;
+                button.text = sceneAsset.name;
             }
 
             return button;
